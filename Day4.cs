@@ -20,8 +20,6 @@ namespace adventofcode2021
         {
             get 
             {
-                bool inRow = true;
-                bool inCol = true;
                 for (int y=0; y<size; y++)
                 {
                     var row = new bool[size];
@@ -29,16 +27,8 @@ namespace adventofcode2021
                     {
                         row[y]=marks[x,y];
                     }
-                    Console.WriteLine($"row {row}");
                     
-                    foreach(var b in row)
-                    {
-                        if (b == false)
-                        {
-                            inRow = false;
-                            break;
-                        }
-                    }
+                    bool inRow = IsAllTrue(row);
                     if (inRow)
                     {
                         return true; //winner
@@ -50,18 +40,9 @@ namespace adventofcode2021
                     var col = new bool[size];
                     for (int y=0; y<size; y++)
                     {
-                        col[x] = marks[x,y];
+                        col[y] = marks[x,y];
                     }
-                    Console.WriteLine($"col {col}");
-                    
-                    foreach(var b in col)
-                    {
-                        if (b == false)
-                        {
-                            inCol = false;
-                            break;
-                        }
-                    }
+                    bool inCol =  IsAllTrue(col);
                     if (inCol)
                     {
                         return true; //winner
@@ -118,6 +99,19 @@ namespace adventofcode2021
                 rowId++;
             }
         }
+
+        private bool IsAllTrue(bool[] line)
+        {
+            foreach (bool b in line)
+            {
+                if (b==false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
     internal static class Day4
     {
@@ -186,16 +180,27 @@ namespace adventofcode2021
                 }
 
                 // finally, compare winning boards for the one with the best score
-                int bestScore = 0;
-                BingoBoard winningBoard = null;
-                foreach (var board in winningBoards)
+                if (winningBoards.Count > 0)
                 {
-                    if (board.score > bestScore)
+                    int bestScore = 0;
+                    BingoBoard winningBoard = null;
+                    foreach (var board in winningBoards)
                     {
-                        winningBoard = board;
+                        if (board.score > bestScore)
+                        {
+                            winningBoard = board;
+                        }
+                    }
+                    if (winningBoard != null)
+                    {
+                        Console.WriteLine($"winning score: {winningBoard.score}");
+                        break;
+                    }
+                    else
+                    {
+                        throw new Exception("winningBoard is null, yet our list of winning boards has entries.");
                     }
                 }
-                Console.WriteLine($"winning score: {winningBoard.score}");
             }
         }
         public static string ExtractValueSequence(string input, out string[] remainingValues)
