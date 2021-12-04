@@ -3,6 +3,14 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
+/*
+using NUnit.Framework;
+from dotnet cli--
+dotnet add package Microsoft.NET.Test.Sdk
+dotnet add package Nunit3TestAdapter
+dotnet add package NUnit
+*/
+
 namespace adventofcode2021
 {
     internal class BingoBoard
@@ -193,8 +201,7 @@ namespace adventofcode2021
                     }
                     if (winningBoard != null)
                     {
-                        Console.WriteLine($"winning score: {winningBoard.score}");
-                        break;
+                        Console.WriteLine($"winning score: {winningBoard.score * drawnValue}");
                     }
                     else
                     {
