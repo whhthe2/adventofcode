@@ -36,10 +36,10 @@ namespace adventofcode2021
             {
                 return File.ReadAllText(filePath);
             }
-/*
+
             try
             {
-                var sessionToken = File.ReadAllText(Path.Combine(userDirectory, $"session.token"));
+                var sessionToken = File.ReadAllText(Path.Combine(userDirectory, $"aoc.session.token"));
 
                 var site = $"https://adventofcode.com/{year}/day/{day}/input";
                 HttpWebRequest request = WebRequest.Create(site) as HttpWebRequest;
@@ -58,9 +58,10 @@ namespace adventofcode2021
                 File.WriteAllText(filePath, responseText);
                 return responseText;
             }
-            catch( Exception )
+            catch( Exception e)
             {
-            }*/
+                Console.WriteLine($"An error occurred while fetching input: {e}");
+            }
             return string.Empty;
         }
     }
