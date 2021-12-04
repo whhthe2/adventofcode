@@ -8,16 +8,33 @@ namespace adventofcode2021
     internal class BingoBoard
     {
         private const int size = 5;
-        public BingoBoard(string[] rows)
-        {
-
-        }
-
         private int[][] board;
         public int[] this[int index]
         {
             get => board[index];
             set => board[index] = value;
+        }
+        public BingoBoard(string[] rows)
+        {
+            board = new int[size][size];
+            int rowId = 0;
+            foreach (var r in rows)
+            {
+                var cols = r.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                if (cols.Length != size)
+                {
+                    throw new Exception($"Row does not have the correct number of elements: {r}");
+                }
+                int colId = 0;
+                foreach (var c in cols)
+                {
+                    board[rowId][colId] = int.Parse(c);
+                    colId++;
+                }
+
+                board[rowId] = r;
+                rowId++;
+            }
         }
     }
     internal static class Day4
@@ -35,7 +52,6 @@ namespace adventofcode2021
             }
 
             //organize boards
-            
             foreach (var s in gameBoards)
             {
                 Console.WriteLine(s);
