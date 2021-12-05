@@ -17,12 +17,10 @@ namespace adventofcode2021
                 new Option<int>( "--day", "the day. Must also provide -y" )
             };*/
 
-            var input = GetOrCacheAdventInput(2021, 4);
+            var input = GetOrCacheAdventInput(2021, 5);
 
-            Day4.Part1(input);
+            Day5.Part1(input);
 
-            //rootCmd.Handler = CommandHandler.Create<string?, int?, int?>(Day4.Part1);
-            //return rootCmd.Invoke(args);
         }
 
         public static string GetOrCacheAdventInput(int year, int day, int part=1)
