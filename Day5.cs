@@ -90,9 +90,7 @@ namespace adventofcode2021
                 {
                     continue;
                 }
-                string sep = ":"; 
-                var cleanLine = line.Replace(" -> ", sep);
-                var splitLine = cleanLine.Split(sep);
+                var splitLine = line.Split(" -> ");
                 string startString = splitLine[0];
                 string endString = splitLine[1];
 
@@ -117,15 +115,21 @@ namespace adventofcode2021
             }
 
             int overlapCount = 0;
+            int consoleWidth = Console.BufferWidth;
             for (int y=0; y<floorSize; y++)
             {
                 for (int x=0; x<floorSize; x++) 
                 {
-                    Console.Write($"{seafloor[x,y]}");
-                        if ( seafloor[x,y] >= 2 )
-                        {
-                            overlapCount++;
-                        }
+                    //visualize the data up until the point where the line would wrap
+                    if (x < consoleWidth)
+                    {
+                        string val = seafloor[x,y] == 0 ? "." : seafloor[x,y].ToString();
+                        Console.Write(val);
+                    }
+                    if ( seafloor[x,y] >= 2 )
+                    {
+                        overlapCount++;
+                    }
                 }
                 Console.WriteLine();
             }
