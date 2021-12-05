@@ -27,9 +27,7 @@ namespace adventofcode2021
                     {
                         row[y]=marks[x,y];
                     }
-                    
-                    bool inRow = IsAllTrue(row);
-                    if (inRow)
+                    if (IsAllTrue(row))
                     {
                         return true; //winner
                     }
@@ -42,8 +40,7 @@ namespace adventofcode2021
                     {
                         col[y] = marks[x,y];
                     }
-                    bool inCol =  IsAllTrue(col);
-                    if (inCol)
+                    if (IsAllTrue(col))
                     {
                         return true; //winner
                     }
