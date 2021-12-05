@@ -12,9 +12,7 @@ dotnet add package NUnit
 */
 
 namespace adventofcode2021
-{
-
-    
+{   
     public struct Coord
     {
         public int x;
@@ -24,15 +22,26 @@ namespace adventofcode2021
             this.x = x;
             this.y = y;
         }
-        public static int Distance(Coord a, Coord b)
-            => ( int )Math.Floor( Math.Sqrt( Math.Pow( b.x-a.x, 2 ) + Math.Pow( b.y-a.y, 2) ) );
     }
 
     public class Line
     {
         public Coord start;
         public Coord end;
-        public bool isStraight => start.x == start.y || end.x == end.y;
+        public bool isStraight => start.x == end.x || start.y == end.y;
+
+        //this returns chessboard distance, a.k.a. Chebyshev distance, 
+        //NOT euclidean distance!
+        public int Length 
+        {
+            get
+            {
+                return Math.Max(
+                    Math.Abs(end.x - start.x), 
+                    Math.Abs(end.y - start.y)
+                );
+            }
+        }
 
         public Line(Coord a, Coord b)
         {
@@ -40,19 +49,27 @@ namespace adventofcode2021
             end = b;
         }
 
-        public static float Lerp(int a, int b, float t)
-        {
-            return a * (1 - t) + b * t;
-        }
-
         public Coord[] GetCoords()
         {
-            int length = Coord.Distance(start, end);
+            //distances
+            int xDist = end.x - start.x;
+            int yDist = end.y - start.y;
+            int xDir = xDist > 0 ? 1 : -1;
+            int yDir = yDist > 0 ? 1 : -1;
+
             List<Coord> coords = new List<Coord>();
-            for (float t=0; t<1; t+=(1f/length))
+            for (int d=0; d<=Length; d++)
             {
-                var x = (int)Math.Floor(Line.Lerp(start.x, end.x, t));
-                var y = (int)Math.Floor(Line.Lerp(start.y, end.y, t));
+                var x = start.x;
+                var y = start.y;
+                if (xDist != 0)
+                {
+                    x += d*xDir;
+                }
+                if (yDist != 0)
+                {
+                    y += d*yDir;
+                }
                 coords.Add(new Coord(x, y));
             }
             return coords.ToArray();
@@ -61,9 +78,8 @@ namespace adventofcode2021
 
     internal static class Day5
     {
-        public static void Part1(string input)
+        public static void Part1(string input, int floorSize)
         {
-            int floorSize = 999;
             int[,] seafloor = new int[floorSize,floorSize];
 
             var inputLines = input.Split("\n");
@@ -94,25 +110,26 @@ namespace adventofcode2021
                 };
 
                 Line ventLine = new Line(start, end);
-                if (ventLine.isStraight)
+                foreach (var c in ventLine.GetCoords())
                 {
-                    foreach (var c in ventLine.GetCoords())
-                    {
-                        seafloor[c.x,c.y] += 1;
-                    }
+                    seafloor[c.x,c.y] += 1;
                 }
             }
 
             int overlapCount = 0;
-            foreach (var x in seafloor)
+            for (int y=0; y<floorSize; y++)
             {
-                if ( x >= 2 )
+                for (int x=0; x<floorSize; x++) 
                 {
-                    overlapCount++;
+                    Console.Write($"{seafloor[x,y]}");
+                        if ( seafloor[x,y] >= 2 )
+                        {
+                            overlapCount++;
+                        }
                 }
+                Console.WriteLine();
             }
             Console.WriteLine(overlapCount.ToString());
-
         }
     }
 }
