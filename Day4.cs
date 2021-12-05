@@ -13,114 +13,6 @@ dotnet add package NUnit
 
 namespace adventofcode2021
 {
-    internal class BingoBoard
-    {
-        // size of the board. the board is square.
-        public const int size = 5;
-
-        // the array of numbers on your board
-        private int[,] board;
-
-        // marks indicate which cells have a bingo chip on them
-        public bool[,] marks;
-
-        public bool HasFiveInARow
-        {
-            get 
-            {
-                for (int y=0; y<size; y++)
-                {
-                    var row = new bool[size];
-                    for (int x=0; x<size; x++)
-                    {
-                        row[y]=marks[x,y];
-                    }
-                    
-                    bool inRow = IsAllTrue(row);
-                    if (inRow)
-                    {
-                        return true; //winner
-                    }
-                }
-
-                for (int x=0; x< size; x++)
-                {
-                    var col = new bool[size];
-                    for (int y=0; y<size; y++)
-                    {
-                        col[y] = marks[x,y];
-                    }
-                    bool inCol =  IsAllTrue(col);
-                    if (inCol)
-                    {
-                        return true; //winner
-                    }
-                }
-                return false;
-            }
-        }
-
-        public int score
-        {
-            get
-            {
-                int scoreTicker = 0;
-                for(int y=0;y<size;y++)
-                {
-                    for (int x=0;x<size;x++)
-                    {
-                        //only unmarked spaces on the board count
-                        if (!marks[x,y])
-                        {
-                            scoreTicker += board[x,y];
-                        }
-                    }
-                }
-                return scoreTicker;
-            }
-        }
-
-        public int this[int r, int c]
-        {
-            get => board[r, c];
-            set => board[r, c] = value;
-        }
-        public BingoBoard(string[] rows)
-        {
-            board = new int[size,size];
-            marks = new bool[size,size];
-            int rowId = 0;
-            foreach (var r in rows)
-            {
-                var cols = r.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                if (cols.Length != size)
-                {
-                    throw new Exception($"Row does not have the correct number of elements: {r}");
-                }
-                int colId = 0;
-                foreach (var c in cols)
-                {
-                    board[rowId,colId] = int.Parse(c);
-                    //marks[rowId,colId] = false;
-                    colId++;
-                }
-                rowId++;
-            }
-        }
-
-        private bool IsAllTrue(bool[] line)
-        {
-            foreach (bool b in line)
-            {
-                if (b==false)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-    }
     internal static class Day4
     {
         private static Queue<int> valueSequence;
@@ -163,7 +55,8 @@ namespace adventofcode2021
             {
                 // get the next number
                 int drawnValue = valueSequence.Dequeue();
-                
+                Console.WriteLine($"drew: {drawnValue}");
+
                 // for tracking tiebreaker candidates;
                 List<BingoBoard> winningBoards = new List<BingoBoard>();
 
@@ -186,26 +79,43 @@ namespace adventofcode2021
                         }
                     }
                 }
-
-                // finally, compare winning boards for the one with the best score
-                if (winningBoards.Count > 0)
+                if(winningBoards.Count == 0)
                 {
+                    Console.WriteLine("no winners this round");
+                }
+                else if (winningBoards.Count == 1 )
+                {
+                    Console.WriteLine($"one winner: {winningBoards[0].score * drawnValue}");
+                }
+                else if (winningBoards.Count > 1)
+                {
+                    // compare winning boards for the one with the best and worst score
                     int bestScore = 0;
-                    BingoBoard winningBoard = null;
+                    int worstScore = int.MaxValue;
+                    BingoBoard bestBoard = null;
+                    BingoBoard worstBoard = null;
                     foreach (var board in winningBoards)
                     {
                         if (board.score > bestScore)
                         {
-                            winningBoard = board;
+                            bestScore = board.score;
+                            bestBoard = board;
+                        }
+                        if (board.score < worstScore)
+                        {
+                            worstScore = board.score;
+                            worstBoard = board;
                         }
                     }
-                    if (winningBoard != null)
+                    Console.WriteLine($"winning score: {bestBoard.score * drawnValue}");
+                    Console.WriteLine($"losing score: {worstBoard.score * drawnValue}");
+                }
+                if (winningBoards.Count > 0)
+                {
+                    //remove them from the game
+                    foreach (var win in winningBoards)
                     {
-                        Console.WriteLine($"winning score: {winningBoard.score * drawnValue}");
-                    }
-                    else
-                    {
-                        throw new Exception("winningBoard is null, yet our list of winning boards has entries.");
+                        boards.Remove(win);
                     }
                 }
             }
