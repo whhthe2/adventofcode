@@ -17,20 +17,13 @@ namespace adventofcode2021
                 new Option<int>( "--day", "the day. Must also provide -y" )
             };*/
 
-            var input = GetOrCacheAdventInput(2021, 5);
+            var input = GetOrCacheAdventInput(2021, 6);
 
-            var testInput = @"0,9 -> 5,9
-8,0 -> 0,8
-9,4 -> 3,4
-2,2 -> 2,1
-7,0 -> 7,4
-6,4 -> 2,0
-0,9 -> 2,9
-3,4 -> 1,4
-0,0 -> 8,8
-5,5 -> 8,2";
+            var testInput = @"3,4,3,1,2";
 
-            Day5.Part1(input, 1000);
+            //Day5.Part1(input, 1000);
+
+            Day6.Part1(input);
 
         }
 
