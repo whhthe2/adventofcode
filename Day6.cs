@@ -15,67 +15,105 @@ namespace adventofcode2021
 {   
     public static class Day6
     {
-        public static void Part1(string input)
-        {
-            var school = Parse(input);
-            var time = 0;
-            var duration = 256;
+        private static bool printSimulation = false;
 
-            while (time < duration)
-            {
-                time++;
-
-                List<Fish> newFishies = new List<Fish>();
-                foreach (var fish in school)
-                {
-                    var newFish = fish.Update();
-                    if (newFish != null)
-                    {
-                        newFishies.Add(newFish);
-                    }
-                }
-                school.AddRange(newFishies);
-            }
-            Console.WriteLine($"There are {school.Count} fish after {duration} days");
-        }
-
-        private static List<Fish> Parse(string input)
+        private static List<sbyte> Parse(string input)
         {
             var splitInput = input.Split(",");
-            List<Fish> school = new List<Fish>();
+            List<sbyte> school = new List<sbyte>();
             foreach (string value in splitInput)
             {
-                int days = int.Parse(value);
-                school.Add(new Fish(days));
+                var days = sbyte.Parse(value);
+                school.Add(days);
             }
             return school;
         }
-    }
 
-    public class Fish
-    {
-        private const int juvenileGestationPeriod = 8;
-        private const int adultGestationPeriod = 6;
-        public int DaysUntilDue;
-
-        public Fish(int daysUntilDue)
+        public static sbyte ProcessFish(sbyte fish, out sbyte? newFish)
         {
-            DaysUntilDue = daysUntilDue;
-        }
-        
-        #nullable enable
-        public Fish? Update()
-        {
-            DaysUntilDue--;
-            if (DaysUntilDue < 0)
+            fish--;
+            newFish = null;
+            if (fish < 0)
             {
                 //reset to 6
-                DaysUntilDue = adultGestationPeriod;
+                fish = 6;
                 //spawn
-                return new Fish(juvenileGestationPeriod);
+                newFish = 8;
             }
-            return null;
+            return fish;
         }
-        #nullable disable
+        public static void GuardVsMaxSize(int newGenCount)
+        {
+            if (newGenCount > (int.MaxValue * 0.99f))
+            {
+                throw new System.Exception($"this new generation of fish is approaching int.MaxValue: {newGenCount}");
+            }
+        }
+
+        private static void PrintSimulationStep(Dictionary<sbyte, long> school, int cursorRow, int cursorCol )
+        {
+            if (!printSimulation)
+            {
+                return;
+            }
+            Console.SetCursorPosition(cursorRow, cursorCol);
+            Console.WriteLine("\n");
+            foreach (var cohort in school)
+            {
+                Console.WriteLine($"{cohort.Key}:{cohort.Value}");
+            }
+            Console.ReadKey(true);
+        }
+        public static long SimulateGrowth(string input, int duration)
+        {
+            //key is gestationAge of the fish, value is the number of fish at that state;
+            var school = new Dictionary<sbyte, long>{
+                {0,0},{1,0},{2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{8,0}
+            };
+
+            var startingPop = Parse(input);
+            foreach (var val in startingPop)
+            {
+                school[val] += 1;
+            }
+
+            int cursorRow = Console.CursorTop+2;
+            int cursorCol = 0;
+            PrintSimulationStep(school, cursorRow, cursorCol);
+
+            int time = 0;
+            while (time < duration)
+            {
+                time++;
+                var updatedSchool = new Dictionary<sbyte, long>{
+                    {0,0},{1,0},{2,0},{3,0},{4,0},{5,0},{6,0},{7,0},{8,0}
+                };
+
+                foreach (var cohort in school)
+                {
+                    sbyte? newFish;
+                    var result = ProcessFish(cohort.Key, out newFish);
+
+                    updatedSchool[result] += cohort.Value;
+
+                    if (newFish != null)
+                    {
+                        updatedSchool[newFish.Value] = cohort.Value;
+                    }
+                }
+
+                school = updatedSchool;
+                PrintSimulationStep(school, cursorRow, cursorCol);
+            }
+
+            long totalPop = 0;
+            foreach (long count in school.Values)
+            {
+                totalPop += count;
+            }
+            return totalPop;
+        }
+
     }
+
 }
