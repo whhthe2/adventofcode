@@ -41,15 +41,31 @@ namespace adventofcode2021
             Console.WriteLine($"the max crab position is {maxPosition}");
             Console.WriteLine($"the min crab position is {minPosition}");
 
+            //fill out the cost of each step to facilitate the cumulative tally
+            Dictionary<int, int> cumulativeCosts = new Dictionary<int, int>();
+            cumulativeCosts.Add(0, 0);
+            var cumulative = 0;
+            for (int n=1; n<=maxPosition; n++)
+            {
+                cumulative += n;
+                cumulativeCosts.Add(n, cumulative);
+            }
+
             var cheapestPosition = int.MaxValue;
             var cheapestCost = int.MaxValue;
 
-            for (int i=minPosition; i<=maxPosition; i++)//; position in positions)
-            {
+            for (int i=minPosition; i<=maxPosition; i++)            {
                 int cost = 0;
                 foreach (int crab in crabPositions)
                 {
-                    cost += Math.Abs(crab - i);
+                    //distance
+                    var d = Math.Abs(crab - i);
+
+                    //p1 algo
+                    //cost += d;
+
+                    //p2 algo
+                    cost += cumulativeCosts[d];
                 }
                 if (cost < cheapestCost)
                 {

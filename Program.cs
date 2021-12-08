@@ -21,9 +21,6 @@ namespace adventofcode2021
             var testInput = "16,1,2,0,4,2,7,1,2,14";
 
             Day7.Part1(input);
-            //Day7.Part1(input);
-
-
 
         }
 
