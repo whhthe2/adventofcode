@@ -8,7 +8,7 @@ namespace adventofcode2021
     internal static class Day3
     {
         static int lineLength;
-        public static void Part1(string input)
+        public static void Solve(string input)
         {
 
             var lines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries);
@@ -21,9 +21,9 @@ namespace adventofcode2021
                 for (int x = 0; x < lineLength; x++)
                 {
                     arr[x,y] = lines[y][x];
-                    Console.Write(arr[x,y].ToString());
+                    //Console.Write(arr[x,y].ToString());
                 }
-                Console.WriteLine();
+                //Console.WriteLine();
             }
             
             char[] gammaRaw = new char[lineLength];
@@ -131,25 +131,26 @@ namespace adventofcode2021
             var rawResult = new char[lineLength];
             for (int i=0; i<lineLength; i++)
             {
-                Console.WriteLine("\n");
-
                 //Most qualified value, based on the `most` param.
                 //Either "most common" or "least common" (when false).
                 char c = getMostCommonValueAtPosition(i, workingArr, most);;
 
                 workingArr = keepMatchingValuesAtPosition(c, i, workingArr);
                 
+                //visualize
+                var cursorPos = Console.GetCursorPosition();
                 for (int y=0; y<workingArr.GetLength(1);y++)
                 {
                     for (int x=0; x<workingArr.GetLength(0); x++)
                     {
                         Console.Write(workingArr[x,y]);
                     }
-                    Console.WriteLine();
+                    Console.SetCursorPosition(cursorPos.Left, cursorPos.Top);
                 }
-
+                
                 if (workingArr.GetLength(1) == 1)
                 {
+                    Console.WriteLine();
                     for (int j=0; j<lineLength; j++)
                     {
                         rawResult[j] = workingArr[j, 0];
