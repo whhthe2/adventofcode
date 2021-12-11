@@ -13,11 +13,11 @@ dotnet add package NUnit
 
 namespace adventofcode2021
 {   
-    public static class Day6
+    public static class Day06
     {
         private static bool printSimulation = false;
 
-        public static long SimulateGrowth(string input, int duration)
+        public static long Solve(string input, int duration)
         {
             //key is the remaining gestation time of the fish
             //value is the number of fish at that state

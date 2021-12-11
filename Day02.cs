@@ -3,10 +3,10 @@ using System.IO;
 
 namespace adventofcode2021
 {
-    internal static class Day2
+    internal static class Day02
     {
         //input here should be a filepath
-        public static void Part2(string input)
+        public static void Solve(string input)
         {
             int position = 0;
             int aim = 0;

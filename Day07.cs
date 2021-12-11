@@ -13,9 +13,9 @@ dotnet add package NUnit
 
 namespace adventofcode2021
 {   
-    public static class Day7
+    public static class Day07
     {
-        public static void Part1(string input)
+        public static void Solve(string input)
         {
             var splitInput = input.Split(",");
             int[] crabPositions = new int[splitInput.Length];

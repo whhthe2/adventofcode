@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace adventofcode2021
 {
-    internal static class Day3
+    internal static class Day03
     {
         static int lineLength;
         public static void Solve(string input)

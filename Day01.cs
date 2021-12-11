@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace adventofcode2021
 {
-    internal static class Day1
+    internal static class Day01
     {
-        public static void Day1Part2(string input)
+        public static void Solve(string input)
         {
             int[] measurements = prepareInput(input);
             

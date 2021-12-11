@@ -13,12 +13,12 @@ dotnet add package NUnit
 
 namespace adventofcode2021
 {   
-    public static class Day9
+    public static class Day09
     {
 
         static int[,] heightMap;
 
-        public static void Part1(string input)
+        public static void Solve(string input)
         {
             //Console.WriteLine(input);
             var splitInput = input.Split("\n");

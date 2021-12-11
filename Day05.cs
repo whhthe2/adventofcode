@@ -65,9 +65,9 @@ namespace adventofcode2021
         }
     }
 
-    internal static class Day5
+    internal static class Day05
     {
-        public static void Part1(string input, int floorSize)
+        public static void Solve(string input, int floorSize)
         {
             int[,] seafloor = new int[floorSize,floorSize];
 
