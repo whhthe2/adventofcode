@@ -9,6 +9,7 @@ namespace adventofcode2021
     {
         private char _opener;
         private char _closer;
+        public char _error;
         private Chunk content;
         private string validChars = "()[]{}<>";
         private static Dictionary<char,char> pairedChars = new Dictionary<char,char>
@@ -18,19 +19,18 @@ namespace adventofcode2021
             {'{', '}'},
             {'<', '>'}
         };
-        
         public static bool IsOpener (char c) => pairedChars.Keys.Contains(c);
         public static bool IsCloser (char c) => pairedChars.Values.Contains(c);
-        
         public bool IsValid => _opener != '\0' && _closer != '\0';
         
         public Chunk(char opener)
         {
             _opener = opener;
             _closer = '\0';
+            _error = '\0';
         }
 
-        //returns true if there is more to 
+        //returns true if valid syntax was encountered 
         public bool Parse(char c)
         {
             validate(c);
@@ -49,13 +49,22 @@ namespace adventofcode2021
             }
             else if (IsCloser(c))
             {
-                if (Close(c))
+                if (pairedChars[_opener] == c)
                 {
+                    _closer = c;
                     return true;
                 }
                 else
                 {
-                    return content.Parse(c);
+                    if (content != null)
+                    {
+                        return content.Parse(c);
+                    }
+                    else
+                    {
+                        _error = c;
+                        throw new Exception($"reached end of nested content. looking for {_opener} but found {c}");
+                    }
                 }
             }
             else
@@ -69,24 +78,6 @@ namespace adventofcode2021
             {
                 throw new Exception($"invalid char {c}");
             }
-        }
-
-        public bool Close(char c)
-        {
-            validate(c);
-            
-            if (pairedChars[_opener] == c)
-            {
-                _closer = c;
-                return true;
-            }
-            else
-            {
-                
-                Console.WriteLine($"Expected {pairedChars[_opener]}, but found {c} instead.");
-                return false;
-            }
-
         }
 
         public override string ToString()
@@ -103,32 +94,31 @@ namespace adventofcode2021
             var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             
             foreach (var line in inputLines)
-            {
-                var syntaxStack = new Stack<char>();
-                
+            {   
                 Chunk rootChunk = null;
+                bool ok = true;
 
                 foreach( char c in line )
                 {
-                    bool ok = true;
+                    
                     if (rootChunk == null)
                     {
                         rootChunk = new Chunk(c);
                     }
                     else
                     {
-                        ok = rootChunk.Parse(c);
-                    }
-
-                    if (!ok)
-                    {
-                        //Console.WriteLine($"{rootChunk}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{rootChunk}");
-                    }                 
+                        try
+                        {
+                            rootChunk.Parse(c);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"error: {e}");
+                            break;
+                        }
+                    }         
                 }
+                Console.WriteLine($"Finished parsing: {rootChunk}");
             }
 
             //Console.WriteLine(input);
