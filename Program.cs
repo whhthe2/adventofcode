@@ -27,10 +27,9 @@ namespace adventofcode2021
         {
             uint selectedYear = year.HasValue ? year.Value : (uint)DateTime.Now.Year;
             uint selectedDay = day.HasValue ? day.Value : (uint)DateTime.Now.Day;
-
             string rawInput = string.IsNullOrEmpty(input) ? rawInput = GetOrCacheAdventInput(selectedYear, selectedDay) : input;
             
-            string puzzleTypeName = $"adventofcode2021.Day{selectedDay}";
+            string puzzleTypeName = $"adventofcode2021.Day{selectedDay.ToString("D2")}";
             Type? puzzle = Type.GetType(puzzleTypeName);
             if (puzzle == null)
             {
