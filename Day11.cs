@@ -8,16 +8,17 @@ namespace adventofcode2021
 {
     internal static class Day11
     {
+        private static Dictionary<Coord,Octopus> grid;
         public static void Solve(string input)
         {
+            //Console.WriteLine(input);
 
-            Console.WriteLine(input);
-            Console.WriteLine("----------");
-            var inputLines = input.Split("\n");
+            var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var xSize = inputLines[0].Length;
             var ySize = inputLines.Length;
 
-            var grid = new Dictionary<Coord,Octopus>();
+            grid = new Dictionary<Coord,Octopus>(xSize*ySize);
+            var gridBuildPos = Console.GetCursorPosition();
             for (int y=0; y<ySize; y++)
             {
                 var row = inputLines[y].ToCharArray();
@@ -25,16 +26,50 @@ namespace adventofcode2021
                 {
                     var energy = int.Parse(row[x].ToString());
                     grid[new Coord(x,y)] = new Octopus(energy,x,y);
+                    Visualize(xSize,ySize);
                 }
+                Console.SetCursorPosition(gridBuildPos.Left, gridBuildPos.Top);
             }
+
+            int simLength = 100;
+            while (simLength > 0)
+            {
+                simLength--;
+                Tick(xSize,ySize);
+                Visualize(xSize,ySize);
+            }
+            
+        }
+
+        public static void Tick(int xSize, int ySize)
+        {
             for (int y=0; y<ySize; y++)
             {
                 for (int x=0; x<xSize; x++) 
                 {
-                    Console.Write(grid[new Coord(x,y)].Energy.ToString());
+                    Coord c;
+                    var surge = grid[new Coord(x,y)].PowerUp(out c);
+                    if (surge)
+                    {
+                        //gotta PowerUp my neighbors
+                        //var nlist = GetNeighbors(c);
+                    }
+                    Console.Write(grid[new Coord(x,y)].Energy);
                 }
                 Console.WriteLine("");
-           } 
+            }
+        }
+
+        public static void Visualize(int xSize, int ySize)
+        {
+            for (int y=0; y<ySize; y++)
+            {
+                for (int x=0; x<xSize; x++) 
+                {
+                    Console.Write(grid[new Coord(x,y)].Energy);
+                }
+                Console.WriteLine("");
+            }
         }
     }
 
