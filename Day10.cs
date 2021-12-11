@@ -5,90 +5,9 @@ using System.Linq;
 
 namespace adventofcode2021
 {
-    internal class Chunk
-    {
-        private char _opener;
-        private char _closer;
-        public char _error;
-        private Chunk content;
-        private string validChars = "()[]{}<>";
-        private static Dictionary<char,char> pairedChars = new Dictionary<char,char>
-        {
-            {'(', ')'},
-            {'[', ']'},
-            {'{', '}'},
-            {'<', '>'}
-        };
-        public static bool IsOpener (char c) => pairedChars.Keys.Contains(c);
-        public static bool IsCloser (char c) => pairedChars.Values.Contains(c);
-        public bool IsValid => _opener != '\0' && _closer != '\0';
-        
-        public Chunk(char opener)
-        {
-            _opener = opener;
-            _closer = '\0';
-            _error = '\0';
-        }
-
-        //returns true if valid syntax was encountered 
-        public bool Parse(char c)
-        {
-            validate(c);
-
-            if (IsOpener(c))
-            {
-                if (content == null)
-                {
-                    content = new Chunk(c);
-                    return true;
-                }
-                else
-                {
-                    return content.Parse(c);
-                }
-            }
-            else if (IsCloser(c))
-            {
-                if (pairedChars[_opener] == c)
-                {
-                    _closer = c;
-                    return true;
-                }
-                else
-                {
-                    if (content != null)
-                    {
-                        return content.Parse(c);
-                    }
-                    else
-                    {
-                        _error = c;
-                        throw new Exception($"reached end of nested content. looking for {_opener} but found {c}");
-                    }
-                }
-            }
-            else
-            {
-                throw new Exception($"encountered invalid character even though it was previously validated...");
-            }
-        }
-        private void validate(char c) 
-        {
-            if (!validChars.Contains(c))
-            {
-                throw new Exception($"invalid char {c}");
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{_opener}{content}{_closer}";
-        }
-    }
-
     internal static class Day10
     {
-        
+        public static int totalPoints = 0;
         public static void Solve(string input)
         {
             var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -96,8 +15,6 @@ namespace adventofcode2021
             foreach (var line in inputLines)
             {   
                 Chunk rootChunk = null;
-                bool ok = true;
-
                 foreach( char c in line )
                 {
                     
@@ -109,19 +26,89 @@ namespace adventofcode2021
                     {
                         try
                         {
-                            rootChunk.Parse(c);
+                            var status = rootChunk.Parse(c);
+                            if (!status)
+                            {
+                                throw new Exception($"parsing {c} failed silently");
+                            }
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine($"error: {e}");
+                            Console.WriteLine($"error parsing: {rootChunk}\n\t{e}");
                             break;
                         }
-                    }         
+                    }
                 }
-                Console.WriteLine($"Finished parsing: {rootChunk}");
             }
+            Console.WriteLine($"total syntax error score: {totalPoints}");
+        }
+    }
 
-            //Console.WriteLine(input);
+    internal class Chunk
+    {
+        private static Dictionary<char,char> pairedChars = new Dictionary<char,char>
+        {
+            {'(', ')'},
+            {'[', ']'},
+            {'{', '}'},
+            {'<', '>'}
+        };
+
+        private static Dictionary<char,int> pointValues = new Dictionary<char, int>
+        {
+            {')', 3},
+            {']', 57},
+            {'}', 1197},
+            {'>', 25137}
+        };
+        public static bool IsOpener (char c) => pairedChars.Keys.Contains(c);
+        public static bool IsCloser (char c) => pairedChars.Values.Contains(c);
+        
+        public char opener;
+        public char closer;
+        public bool IsValid => opener != '\0' && closer != '\0';
+
+        public Stack<Chunk> children;
+
+        public Chunk(char c)
+        {
+            opener = c;
+            closer = '\0';
+            children = new Stack<Chunk>();
+        }
+
+        public bool Parse(char c)
+        {
+            if (IsOpener(c))
+            {
+                children.Push(new Chunk(c));
+                return true;
+            }
+            if (IsCloser(c))
+            {
+                Chunk child;
+                char match;
+                if (children.TryPop(out child))
+                {
+                    match = pairedChars[child.opener];
+                }
+                else
+                {
+                    match = pairedChars[opener];
+                }
+
+                if (match == c)
+                {
+                    return true;
+                }
+                else
+                {
+                    Day10.totalPoints += pointValues[c];
+                    throw new Exception($"Expected {match}, but found {c} instead. {pointValues[c]} points!");
+                }
+                
+            }
+            throw new Exception($"Token {c} is not an opening or closing token.");
         }
     }
 }
