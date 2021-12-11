@@ -31,7 +31,8 @@ namespace adventofcode2021
             {
                 for (int x=0; x<xSize; x++) 
                 {
-                    Console.Write(grid[new Coord(x,y)].Energy.ToString());
+                    var pos = new Coord(x,y);
+                    Console.Write(grid[pos].Energy);
                 }
                 Console.WriteLine("");
            } 
@@ -54,14 +55,20 @@ namespace adventofcode2021
         public bool PowerUp(out Coord c)
         {
             Energy++;
-            if (Energy > 9)
+            if (Energy > 9 && !HasFlashed)
             {
                 Energy = 0;
+                HasFlashed = true;
                 c = position;
                 return true;
             }
             c = new Coord(-1,-1);//an invalid coord;
             return false;
+        }
+
+        public void Reset()
+        {
+            HasFlashed = false;
         }
     }
 }
