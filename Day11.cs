@@ -11,64 +11,57 @@ namespace adventofcode2021
         private static Dictionary<Coord,Octopus> grid;
         public static void Solve(string input)
         {
-            //Console.WriteLine(input);
-
-            var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries);
             var xSize = inputLines[0].Length;
             var ySize = inputLines.Length;
-
-            grid = new Dictionary<Coord,Octopus>(xSize*ySize);
-            var gridBuildPos = Console.GetCursorPosition();
+            var grid = new Dictionary<Coord,Octopus>();
             for (int y=0; y<ySize; y++)
             {
                 var row = inputLines[y].ToCharArray();
+                if (row.Length < xSize) { continue; }
+
                 for (int x=0; x<xSize; x++)
                 {
                     var energy = int.Parse(row[x].ToString());
                     grid[new Coord(x,y)] = new Octopus(energy,x,y);
-                    Visualize(xSize,ySize);
-                }
-                Console.SetCursorPosition(gridBuildPos.Left, gridBuildPos.Top);
+                }    
+            }
+            var ticks = 100;
+            while (ticks > 0)
+            {
+                ticks--;
+                for (int y=0; y<ySize; y++){ for (int x=0; x<xSize; x++) {
+                    grid[new Coord(x,y)].Energy++;
+                }}
+
+                for (int y=0; y<ySize; y++){ for (int x=0; x<xSize; x++) {
+                    PowerUpWithNeighbors(new Coord(x,y), grid);
+                }}
+
+                for (int y=0; y<ySize; y++) { for (int x=0; x<xSize; x++) {
+                    grid[new Coord(x,y)].Reset();
+                }}
+                Console.WriteLine($"score after one tick {Octopus.Score}");
             }
 
-            int simLength = 100;
-            while (simLength > 0)
+            Console.WriteLine($"final score: {Octopus.Score}");
+        }
+
+
+        public static void PowerUpWithNeighbors(Coord source, Dictionary<Coord, Octopus> grid)
+        {
+            Octopus srcOcto;
+            if (!grid.TryGetValue(source, out srcOcto))
             {
-                simLength--;
-                Tick(xSize,ySize);
-                Visualize(xSize,ySize);
+                return;
             }
+            Coord flash;
             
-        }
-
-        public static void Tick(int xSize, int ySize)
-        {
-            for (int y=0; y<ySize; y++)
+            if (srcOcto.PowerUp(out flash))
             {
-                for (int x=0; x<xSize; x++) 
-                {
-                    Coord c;
-                    var surge = grid[new Coord(x,y)].PowerUp(out c);
-                    if (surge)
-                    {
-                        //gotta PowerUp my neighbors
-                        //var nlist = GetNeighbors(c);
-                    }
-                    Console.Write(grid[new Coord(x,y)].Energy);
-                }
-                Console.WriteLine("");
-            }
-        }
-
-        public static void Visualize(int xSize, int ySize)
-        {
-            for (int y=0; y<ySize; y++)
-            {
-                for (int x=0; x<xSize; x++) 
-                {
-                    Console.Write(grid[new Coord(x,y)].Energy);
-                }
-                Console.WriteLine("");
+                var validNeighbors = flash.GetNeighbors().Where( x => grid.ContainsKey(x)).ToList<Coord>();
+                validNeighbors.ForEach( c => grid[c].Energy++ );
+                validNeighbors.ForEach( c => PowerUpWithNeighbors(c, grid));
             }
         }
     }
@@ -88,15 +81,25 @@ namespace adventofcode2021
 
         public bool PowerUp(out Coord c)
         {
-            Energy++;
-            if (Energy > 9)
+            if (Energy > 9 && !HasFlashed)
             {
-                Energy = 0;
+                HasFlashed = true;
                 c = position;
                 return true;
             }
             c = new Coord(-1,-1);//an invalid coord;
             return false;
+        }
+
+        public static int Score = 0;
+        public void Reset()
+        {
+            if (HasFlashed)
+            {
+                HasFlashed = false;
+                Energy = 0;
+                Score++;
+            }
         }
     }
 }
