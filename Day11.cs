@@ -55,11 +55,12 @@ namespace adventofcode2021
                 return;
             }
             Coord flash;
+            
             if (srcOcto.PowerUp(out flash))
             {
-                flash.GetNeighbors().ForEach( c => {
-                    PowerUpWithNeighbors(c, grid);
-                });
+                var validNeighbors = flash.GetNeighbors().Where( x => grid.ContainsKey(x)).ToList<Coord>();
+                validNeighbors.ForEach( c => grid[c].Energy++ );
+                validNeighbors.ForEach( c => PowerUpWithNeighbors(c, grid));
             }
         }
     }
@@ -92,11 +93,11 @@ namespace adventofcode2021
         public static int Score = 0;
         public void Reset()
         {
-            Energy = 0;
             if (HasFlashed)
             {
-                Score++;
                 HasFlashed = false;
+                Energy = 0;
+                Score++;
             }
         }
     }
