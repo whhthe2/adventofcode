@@ -10,32 +10,57 @@ namespace adventofcode2021
     {
         public static void Solve(string input)
         {
-
-            Console.WriteLine(input);
-            Console.WriteLine("----------");
-            var inputLines = input.Split("\n");
+            var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries);
             var xSize = inputLines[0].Length;
             var ySize = inputLines.Length;
-
             var grid = new Dictionary<Coord,Octopus>();
             for (int y=0; y<ySize; y++)
             {
                 var row = inputLines[y].ToCharArray();
+                if (row.Length < xSize) { continue; }
+
                 for (int x=0; x<xSize; x++)
                 {
                     var energy = int.Parse(row[x].ToString());
                     grid[new Coord(x,y)] = new Octopus(energy,x,y);
                 }
             }
-            for (int y=0; y<ySize; y++)
+            var ticks = 100;
+            while (ticks > 0)
             {
-                for (int x=0; x<xSize; x++) 
-                {
-                    var pos = new Coord(x,y);
-                    Console.Write(grid[pos].Energy);
-                }
-                Console.WriteLine("");
-           } 
+                ticks--;
+                for (int y=0; y<ySize; y++){ for (int x=0; x<xSize; x++) {
+                    grid[new Coord(x,y)].Energy++;
+                }}
+
+                for (int y=0; y<ySize; y++){ for (int x=0; x<xSize; x++) {
+                    PowerUpWithNeighbors(new Coord(x,y), grid);
+                }}
+
+                for (int y=0; y<ySize; y++) { for (int x=0; x<xSize; x++) {
+                    grid[new Coord(x,y)].Reset();
+                }}
+                Console.WriteLine($"score after one tick {Octopus.Score}");
+            }
+
+            Console.WriteLine($"final score: {Octopus.Score}");
+        }
+
+
+        public static void PowerUpWithNeighbors(Coord source, Dictionary<Coord, Octopus> grid)
+        {
+            Octopus srcOcto;
+            if (!grid.TryGetValue(source, out srcOcto))
+            {
+                return;
+            }
+            Coord flash;
+            if (srcOcto.PowerUp(out flash))
+            {
+                flash.GetNeighbors().ForEach( c => {
+                    PowerUpWithNeighbors(c, grid);
+                });
+            }
         }
     }
 
@@ -54,10 +79,8 @@ namespace adventofcode2021
 
         public bool PowerUp(out Coord c)
         {
-            Energy++;
             if (Energy > 9 && !HasFlashed)
             {
-                Energy = 0;
                 HasFlashed = true;
                 c = position;
                 return true;
@@ -66,9 +89,15 @@ namespace adventofcode2021
             return false;
         }
 
+        public static int Score = 0;
         public void Reset()
         {
-            HasFlashed = false;
+            Energy = 0;
+            if (HasFlashed)
+            {
+                Score++;
+                HasFlashed = false;
+            }
         }
     }
 }
