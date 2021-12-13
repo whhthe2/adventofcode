@@ -26,10 +26,23 @@ namespace adventofcode2021
                     grid[new Coord(x,y)] = new Octopus(energy,x,y);
                 }    
             }
-            var ticks = 100;
-            while (ticks > 0)
+            var steps = 0;
+            while (steps < 300)
             {
-                ticks--;
+                Console.WriteLine($"Score after step {steps}: {Octopus.Score}");
+                
+                /*
+                for (int y=0; y<ySize; y++)
+                { 
+                    for (int x=0; x<xSize; x++) 
+                    {
+                        Console.Write(grid[new Coord(x,y)].Energy);
+                    }
+                    Console.WriteLine();
+                }
+                */
+
+                steps++;
                 for (int y=0; y<ySize; y++){ for (int x=0; x<xSize; x++) {
                     grid[new Coord(x,y)].Energy++;
                 }}
@@ -38,10 +51,16 @@ namespace adventofcode2021
                     PowerUpWithNeighbors(new Coord(x,y), grid);
                 }}
 
+                var flashCount = 0;
                 for (int y=0; y<ySize; y++) { for (int x=0; x<xSize; x++) {
-                    grid[new Coord(x,y)].Reset();
+                    flashCount += grid[new Coord(x,y)].Reset();
                 }}
-                Console.WriteLine($"score after one tick {Octopus.Score}");
+
+                if (flashCount == xSize * ySize)
+                {
+                    Console.WriteLine($"Syncronization occurred at step {steps}");
+                    break;
+                }
             }
 
             Console.WriteLine($"final score: {Octopus.Score}");
@@ -92,14 +111,16 @@ namespace adventofcode2021
         }
 
         public static int Score = 0;
-        public void Reset()
+        public int Reset()
         {
             if (HasFlashed)
             {
                 HasFlashed = false;
                 Energy = 0;
                 Score++;
+                return 1;
             }
+            return 0;
         }
     }
 }
