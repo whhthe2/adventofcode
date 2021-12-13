@@ -8,7 +8,6 @@ namespace adventofcode2021
 {
     internal static class Day11
     {
-        private static Dictionary<Coord,Octopus> grid;
         public static void Solve(string input)
         {
             var inputLines = input.Split("\n", StringSplitOptions.RemoveEmptyEntries);
