@@ -12,6 +12,7 @@ namespace adventofcode2021
         private static List<Stack<Node>> paths = new List<Stack<Node>>();
         private static Stack<Node> currentPath = new Stack<Node>();
 
+        private static Node start;
         private static Node end;
 
         public static void Solve(string input)
@@ -21,7 +22,6 @@ namespace adventofcode2021
             nodes = new HashSet<Node>();
             PuzzleInput.ParseHashSet<Node>(input, CreateNodes);
 
-            Node start; 
             if (!nodes.TryGetValue(new Node("start"), out start))
             {
                 throw new Exception("Starting Node not found.");
@@ -33,22 +33,27 @@ namespace adventofcode2021
 
             RecursiveDFS(start);
 
+            var tally = 0;
             if (paths.Count > 0)
             {
                 foreach (var p in paths)
                 {
                     foreach (var n in p)
                     {
-                        Console.Write($"{n} ");
+                        if (n.Name == n.Name.ToLower() && n.Name != "start" && n.Name != "end")
+                        {
+                            tally++;
+                            break;
+                        }
                     }
-                    Console.WriteLine();
                 }
             }
             else
             {
                 throw new Exception("no paths found!");
             }
-            
+            Console.WriteLine($"There are {tally} paths that visit small caves at least once");
+            Console.WriteLine($"There are a total of {paths.Count} paths");
         }
 
         public static void RecursiveDFS(Node current)
@@ -71,9 +76,42 @@ namespace adventofcode2021
             {
                 foreach (var conn in current.Connections)
                 {
-                    if (conn.Big || !currentPath.Contains(conn))
+                    if (conn.Big)
                     {
                         RecursiveDFS(conn);
+                    }
+                    else if (!currentPath.Contains(conn))
+                    {
+                        RecursiveDFS(conn);
+                    }
+                    else
+                    {
+                        if (conn == start)
+                        {
+                            //don't go there
+                        }
+                        else if (conn == end)
+                        {
+                            RecursiveDFS(conn);
+                        }
+                        else
+                        {
+                            //see if we already visited a small cave twice
+                            bool hasDupes = false;
+                            foreach (Node n in currentPath)
+                            {
+                                var nCount = currentPath.Count( x => x.Name == n.Name && !x.Big);
+                                if (nCount > 1)
+                                {
+                                    hasDupes = true;
+                                    break;
+                                }
+                            }
+                            if (!hasDupes)
+                            {
+                                RecursiveDFS(conn);
+                            }
+                        }
                     }
                 }
             }
